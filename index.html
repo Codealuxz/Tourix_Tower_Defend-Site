@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tower Defense</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="controls">
+        <div class="game-info">
+            <p>Argent: <span id="money">100</span>$</p>
+            <p>Vies: <span id="lives">20</span></p>
+        </div>
+        <button onclick="placeTower()">Placer une tour (50$)</button>
+        <button id="speedButton" onclick="toggleSpeed()">Vitesse: x1</button>
+    </div>
+    <script src="game.js"></script>
+</body>
+
+</html>
