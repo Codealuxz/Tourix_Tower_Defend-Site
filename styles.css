@@ -155,13 +155,14 @@ span {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: var(--color-overlay-dark);
-    color: var(--color-gold);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #FFD700;
     padding: 20px;
     border-radius: 10px;
     font-weight: bold;
-    animation: fadeInOut 2s forwards;
     z-index: 1000;
+    display: none;
+    /* Masqué par défaut */
 }
 
 /* Style pour le survol des tours */

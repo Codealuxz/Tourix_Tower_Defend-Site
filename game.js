@@ -204,14 +204,14 @@ class Tower {
         ctx.fillStyle = '#34495E';
         ctx.fill();
 
-        // Afficher le coût d'amélioration au survol
+        // Déplacé à la fin de la méthode draw pour être au premier plan
         if (this.showUpgrade) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
             ctx.fillRect(this.x * GRID_SIZE, this.y * GRID_SIZE - 30, GRID_SIZE, 25);
             ctx.fillStyle = '#FFFFFF';
             ctx.font = '12px Arial';
             ctx.textAlign = 'center';
-            const nextUpgrade = this.level % 2 === 0 ? "Range" : "Speed";
+            const nextUpgrade = this.level % 2 === 0 ? "Speed" : "Range";
             ctx.fillText(`Upgrade ${nextUpgrade}: ${this.upgradeCost}$`,
                 this.x * GRID_SIZE + GRID_SIZE / 2,
                 this.y * GRID_SIZE - 15);
@@ -538,24 +538,20 @@ function spawnEnemy() {
         enemies.push(new Enemy(currentWave));
         enemiesSpawned++;
     } else if (enemies.length === 0) {
-        // Préparer la prochaine vague
         waveInProgress = false;
         currentWave++;
-
-        // Augmentation progressive du nombre d'ennemis
         enemiesInWave = Math.floor(5 + (currentWave * 1.5));
         enemiesSpawned = 0;
-
-        // Afficher un message de nouvelle vague
         showWaveMessage();
-
-        // Délai avant la prochaine vague
-        const delayBetweenWaves = Math.max(2000, 5000 - (currentWave * 100));
+        const delayBetweenWaves = 1000; // Réduit le délai
         setTimeout(startNextWave, delayBetweenWaves);
     }
 }
 
 function showWaveMessage() {
+    const waveMessage = document.getElementById('waveMessage');
+    if (!waveMessage) return; // Vérifiez si l'élément existe
+
     const waveSpan = document.getElementById('wave');
     waveSpan.textContent = currentWave;
 
@@ -566,6 +562,15 @@ function showWaveMessage() {
             PV: ${100 * currentWave}<br>
         `;
     }
+
+    // Afficher le message de la vague
+    waveMessage.textContent = `Vague ${currentWave}`;
+    waveMessage.style.display = 'block';
+
+    // Masquer le message après 2 secondes
+    setTimeout(() => {
+        waveMessage.style.display = 'none';
+    }, 1000);
 }
 
 function addWaveDisplay() {
@@ -606,9 +611,13 @@ function gameLoop() {
     drawGrid();
     drawPath();
 
+    // Dessiner les projectiles avant de dessiner les tours
     towers.forEach(tower => {
-        tower.draw();
-        tower.shoot();
+        tower.shoot(); // Tire les projectiles
+    });
+
+    towers.forEach(tower => {
+        tower.draw(); // Dessine la tour
     });
 
     enemies = enemies.filter(enemy => {
@@ -620,8 +629,12 @@ function gameLoop() {
     drawTowerPreview();
 
     if (lives <= 0) {
-        alert('Game Over!');
-        location.reload();
+        // Afficher le message de game over
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        gameOverMessage.style.display = 'block';
+        setTimeout(() => {
+            location.reload();
+        }, 2000); // Recharge la page après 2 secondes
     }
 
     requestAnimationFrame(gameLoop);
