@@ -31,15 +31,37 @@ let path = [
     { x: 10, y: 6 },
     { x: 10, y: 7 },
     { x: 10, y: 8 },
-    { x: 10, y: 9 },
+    { x: 9, y: 8 },
+    { x: 8, y: 8 },
+    { x: 7, y: 8 },
+    { x: 7, y: 9 },
+    { x: 7, y: 10 },
+    { x: 7, y: 11 },
+    { x: 7, y: 12 },
+    { x: 8, y: 12 },
+    { x: 9, y: 12 },
+    { x: 10, y: 12 },
+    { x: 10, y: 11 },
     { x: 10, y: 10 },
     { x: 11, y: 10 },
     { x: 12, y: 10 },
     { x: 13, y: 10 },
     { x: 14, y: 10 },
-    { x: 15, y: 10 },
-    { x: 16, y: 10 },
-    { x: 17, y: 10 },
+    { x: 14, y: 9 },
+    { x: 14, y: 8 },
+    { x: 14, y: 7 },
+    { x: 14, y: 6 },
+    { x: 14, y: 5 },
+    { x: 14, y: 4 },
+    { x: 15, y: 4 },
+    { x: 16, y: 4 },
+    { x: 17, y: 4 },
+    { x: 18, y: 4 },
+    { x: 18, y: 6 },
+    { x: 18, y: 7 },
+    { x: 18, y: 8 },
+    { x: 18, y: 9 },
+    { x: 18, y: 10 },
     { x: 18, y: 10 },
     { x: 19, y: 10 }
 ];
@@ -211,7 +233,7 @@ class Tower {
             ctx.fillStyle = '#FFFFFF';
             ctx.font = '12px Arial';
             ctx.textAlign = 'center';
-            const nextUpgrade = this.level % 2 === 0 ? "Speed" : "Range";
+            const nextUpgrade = this.level % 2 === 0 ? "Range" : "Speed";
             ctx.fillText(`Upgrade ${nextUpgrade}: ${this.upgradeCost}$`,
                 this.x * GRID_SIZE + GRID_SIZE / 2,
                 this.y * GRID_SIZE - 15);
@@ -300,6 +322,16 @@ class Enemy {
         // Corps de l'ennemi
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // Dessiner les yeux
+        const eyeWidth = 4;
+        const eyeHeight = 4;
+        const eyeX = this.x + this.width / 4; // Position des yeux
+        const eyeY = this.y + this.height / 4; // Position des yeux
+
+        ctx.fillStyle = '#FFFFFF'; // Couleur des yeux
+        ctx.fillRect(eyeX, eyeY, eyeWidth, eyeHeight); // Oeil gauche
+        ctx.fillRect(eyeX + this.width / 2, eyeY, eyeWidth, eyeHeight); // Oeil droit
 
         // Niveau de l'ennemi (affiché au-dessus de la barre de vie)
         ctx.fillStyle = '#FFFFFF';
@@ -611,13 +643,9 @@ function gameLoop() {
     drawGrid();
     drawPath();
 
-    // Dessiner les projectiles avant de dessiner les tours
     towers.forEach(tower => {
-        tower.shoot(); // Tire les projectiles
-    });
-
-    towers.forEach(tower => {
-        tower.draw(); // Dessine la tour
+        tower.draw();
+        tower.shoot();
     });
 
     enemies = enemies.filter(enemy => {
