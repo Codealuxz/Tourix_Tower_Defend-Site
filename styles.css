@@ -1,16 +1,32 @@
 :root {
+<<<<<<< HEAD
+=======
+
+>>>>>>> 447ebf5d50bf018dbb980bc9773a5b2050afd6c5
     --color-background: #000c18;
     --color-primary: #34acdb;
     --color-primary-dark: #2954b9;
     --color-secondary: #ffffff10;
     --color-accent: #E74C3C;
     --color-accent-dark: #C0392B;
+<<<<<<< HEAD
     --color-text: white;
     --color-text-muted: #BDC3C7;
     --color-value: #F1C40F;
     --color-grass: #90CF50;
     --color-disabled: #95A5A6;
     --color-gold: #FFD700;
+=======
+
+    --color-text: white;
+    --color-text-muted: #BDC3C7;
+    --color-value: #F1C40F;
+
+    --color-grass: #90CF50;
+    --color-disabled: #95A5A6;
+    --color-gold: #FFD700;
+
+>>>>>>> 447ebf5d50bf018dbb980bc9773a5b2050afd6c5
     --color-overlay-dark: rgba(0, 0, 0, 0.8);
     --color-overlay-light: rgba(0, 0, 0, 0.3);
     --color-overlay-blue: rgba(74, 144, 226, 0.2);
@@ -52,6 +68,7 @@ body {
     flex-wrap: wrap;
 }
 
+<<<<<<< HEAD
 .controls div {
     display: flex;
     gap: 20px;
@@ -61,6 +78,8 @@ body {
 
 
 
+=======
+>>>>>>> 447ebf5d50bf018dbb980bc9773a5b2050afd6c5
 button {
     background-color: var(--color-primary);
     color: var(--color-text);
@@ -157,6 +176,10 @@ span {
     font-weight: bold;
     z-index: 1000;
     display: none;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 447ebf5d50bf018dbb980bc9773a5b2050afd6c5
 }
 
 .tower-info {
