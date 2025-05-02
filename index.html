@@ -12,9 +12,17 @@
         <div class="game-info">
             <p>Argent: <span id="money">100</span>$</p>
             <p>Vies: <span id="lives">20</span></p>
+        </div><br>
+        <div class="buttons">
+            <button onclick="placeTower()">Placer une tour (50$)</button>
+            <button onclick="placeDoubleTower()">Placer une tour double (300$)</button>
         </div>
-        <button onclick="placeTower()">Placer une tour (50$)</button>
-        <button id="speedButton" onclick="toggleSpeed()">Vitesse: x1</button>
+        <div class="speed-slider">
+            <label for="speedSlider">Vitesse: <span id="speedValue">1</span></label>
+            <input type="range" min="1" max="20" value="1" id="speedSlider"
+                oninput="document.getElementById('speedValue').textContent = this.value;">
+        </div>
+        <button onclick="resetGame()">Réinitialiser le jeu</button>
     </div>
     <div id="waveMessage" class="message" style="display: none;"></div>
     <div id="gameOverMessage" class="message" style="display: none;">Game Over!</div>

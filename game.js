@@ -66,13 +66,12 @@ let path = [
     { x: 19, y: 10 }
 ];
 
-// Ajouter une variable pour le contrôle de la vitesse
 let gameSpeed = 1;
 
-let previewTower = null; // Pour l'aperçu de la tour
+let previewTower = null;
 let isPlacingTower = false;
+let isPlacingDoubleTower = false;
 
-// Ajouter un tableau pour stocker la séquence de touches
 let cheatSequence = [];
 let cheatCode = ['c', 'h', 'e', 'a', 't'];
 
@@ -88,13 +87,10 @@ class Projectile {
     }
 
     draw() {
-        // Projectile avec effet de brillance
         ctx.fillStyle = '#FFD700';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
-
-        // Effet de brillance
         ctx.fillStyle = '#FFFFFF';
         ctx.beginPath();
         ctx.arc(this.x - 1, this.y - 1, this.radius / 2, 0, Math.PI * 2);
@@ -103,23 +99,17 @@ class Projectile {
 
     move() {
         if (this.hasHit) return true;
-
-        // Ajuster la vitesse des projectiles
         const currentSpeed = this.baseSpeed * gameSpeed;
-
         const dx = this.targetEnemy.x + this.targetEnemy.width / 2 - this.x;
         const dy = this.targetEnemy.y + this.targetEnemy.height / 2 - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-
         this.x += (dx / distance) * currentSpeed;
         this.y += (dy / distance) * currentSpeed;
-
         if (this.targetEnemy.isColliding(this)) {
             this.targetEnemy.health -= this.damage;
             this.hasHit = true;
             return true;
         }
-
         return distance > 1000;
     }
 }
@@ -139,94 +129,72 @@ class Tower {
         this.showUpgrade = false;
     }
 
-    // Obtenir la portée actuelle en fonction du niveau
     getRange() {
-        // Augmente la portée aux niveaux impairs
         const rangeUpgrades = Math.floor((this.level + 1) / 2);
         return this.range + (rangeUpgrades * 50);
     }
 
-    // Obtenir le cooldown actuel en fonction du niveau
     getCooldown() {
-        // Augmente la vitesse aux niveaux pairs
         const speedUpgrades = Math.floor(this.level / 2);
         return this.baseCooldown / (1 + speedUpgrades * 0.5);
     }
 
     draw() {
-        // Couleurs différentes selon le niveau
         let baseColor;
         switch (this.level) {
             case 1:
-                baseColor = '#4A90E2'; // Bleu clair
+                baseColor = '#4A90E2';
                 break;
             case 2:
-                baseColor = '#2980B9'; // Bleu foncé
+                baseColor = '#2980B9';
                 break;
             case 3:
-                baseColor = '#8E44AD'; // Violet
+                baseColor = '#8E44AD';
                 break;
             case 4:
-                baseColor = '#C0392B'; // Rouge foncé
+                baseColor = '#C0392B';
                 break;
             default:
-                baseColor = '#E74C3C'; // Rouge vif pour les niveaux supérieurs
+                baseColor = '#E74C3C';
         }
-
-        // Portée de la tour (dessinée en premier pour être sous la tour)
         if (this.showRange) {
             ctx.strokeStyle = 'rgba(74, 144, 226, 0.5)';
             ctx.fillStyle = 'rgba(74, 144, 226, 0.2)';
             ctx.beginPath();
             const centerX = this.x * GRID_SIZE + GRID_SIZE / 2;
             const centerY = this.y * GRID_SIZE + GRID_SIZE / 2;
-            // Utiliser la portée calculée
             const currentRange = this.getRange();
             ctx.arc(centerX, centerY, currentRange, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
         }
-
-        // Base de la tour
         ctx.fillStyle = baseColor;
         ctx.fillRect(this.x * GRID_SIZE, this.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
-
-        // Canon de la tour
         ctx.fillStyle = '#2C3E50';
         const centerX = this.x * GRID_SIZE + GRID_SIZE / 2;
         const centerY = this.y * GRID_SIZE + GRID_SIZE / 2;
-
-        // Trouver l'ennemi le plus proche pour orienter le canon
         const target = this.findTarget();
         if (target) {
             ctx.save();
             ctx.translate(centerX, centerY);
-
             const angle = Math.atan2(
                 target.y + GRID_SIZE / 4 - centerY,
                 target.x + GRID_SIZE / 4 - centerX
             );
             ctx.rotate(angle);
-
             ctx.fillRect(0, -4, GRID_SIZE / 2, 8);
             ctx.restore();
         } else {
             ctx.fillRect(centerX, centerY - 4, GRID_SIZE / 2, 8);
         }
-
-        // Niveau de la tour
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 14px Arial';
         ctx.textAlign = 'center';
         ctx.fillText(this.level, centerX, centerY + 5);
-
-        // Cercle central de la tour
         ctx.beginPath();
         ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
         ctx.fillStyle = '#34495E';
         ctx.fill();
-
-        // Déplacé à la fin de la méthode draw pour être au premier plan
         if (this.showUpgrade) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
             ctx.fillRect(this.x * GRID_SIZE, this.y * GRID_SIZE - 30, GRID_SIZE, 25);
@@ -242,9 +210,7 @@ class Tower {
 
     shoot() {
         const now = Date.now();
-        // Ajuster le cooldown en fonction du niveau (tire plus vite avec le niveau)
         const currentCooldown = this.getCooldown();
-
         if (now - this.lastShot >= currentCooldown) {
             const target = this.findTarget();
             if (target) {
@@ -258,7 +224,6 @@ class Tower {
                 this.lastShot = now;
             }
         }
-
         this.projectiles = this.projectiles.filter(proj => {
             proj.draw();
             return !proj.move();
@@ -271,12 +236,9 @@ class Tower {
             const centerY = this.y * GRID_SIZE + GRID_SIZE / 2;
             const enemyCenterX = enemy.x + enemy.width / 2;
             const enemyCenterY = enemy.y + enemy.height / 2;
-
             const dx = enemyCenterX - centerX;
             const dy = enemyCenterY - centerY;
             const distance = Math.sqrt(dx * dx + dy * dy);
-
-            // Utiliser la portée calculée
             return distance <= this.getRange();
         });
     }
@@ -293,10 +255,57 @@ class Tower {
     }
 }
 
+class DoubleTower extends Tower {
+    constructor(x, y, level = 1) {
+        super(x, y, level);
+        this.damage = 50;
+        this.baseCooldown = 2000;
+        this.upgradeCost = 200;
+    }
+
+    shoot() {
+        const now = Date.now();
+        const currentCooldown = this.getCooldown();
+        if (now - this.lastShot >= currentCooldown) {
+            const target = this.findTarget();
+            if (target) {
+                const projectile1 = new Projectile(
+                    this.x * GRID_SIZE + GRID_SIZE / 2 - 10,
+                    this.y * GRID_SIZE + GRID_SIZE / 2,
+                    target,
+                    this.damage
+                );
+                const projectile2 = new Projectile(
+                    this.x * GRID_SIZE + GRID_SIZE / 2 + 10,
+                    this.y * GRID_SIZE + GRID_SIZE / 2,
+                    target,
+                    this.damage
+                );
+                this.projectiles.push(projectile1, projectile2);
+                this.lastShot = now;
+            }
+        }
+        this.projectiles = this.projectiles.filter(proj => {
+            proj.draw();
+            return !proj.move();
+        });
+    }
+
+    draw() {
+        const centerX = this.x * GRID_SIZE + GRID_SIZE / 2;
+        const centerY = this.y * GRID_SIZE + GRID_SIZE / 2;
+        ctx.fillStyle = '#FF5733';
+        ctx.fillRect(this.x * GRID_SIZE, this.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+        ctx.fillStyle = '#2C3E50';
+        ctx.fillRect(centerX - 10, centerY - 10, 20, 20);
+        ctx.fillRect(centerX - 30, centerY - 10, 20, 20);
+        ctx.fillRect(centerX + 10, centerY - 10, 20, 20);
+    }
+}
+
 class Enemy {
     constructor(wave) {
         this.pathIndex = 0;
-        // Positionner l'ennemi au centre de la case
         this.x = path[0].x * GRID_SIZE + GRID_SIZE / 4;
         this.y = path[0].y * GRID_SIZE + GRID_SIZE / 4;
         this.width = GRID_SIZE / 2;
@@ -306,7 +315,6 @@ class Enemy {
         this.health = this.maxHealth;
         this.baseSpeed = 1;
         this.reward = wave * 2;
-
         const colorPhase = (wave - 1) % 5;
         this.colors = {
             0: '#FF4444',
@@ -319,74 +327,52 @@ class Enemy {
     }
 
     draw() {
-        // Corps de l'ennemi
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
-
-        // Dessiner les yeux
         const eyeWidth = 4;
         const eyeHeight = 4;
-        const eyeX = this.x + this.width / 4; // Position des yeux
-        const eyeY = this.y + this.height / 4; // Position des yeux
-
-        ctx.fillStyle = '#FFFFFF'; // Couleur des yeux
-        ctx.fillRect(eyeX, eyeY, eyeWidth, eyeHeight); // Oeil gauche
-        ctx.fillRect(eyeX + this.width / 2, eyeY, eyeWidth, eyeHeight); // Oeil droit
-
-        // Niveau de l'ennemi (affiché au-dessus de la barre de vie)
+        const eyeX = this.x + this.width / 4;
+        const eyeY = this.y + this.height / 4;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(eyeX, eyeY, eyeWidth, eyeHeight);
+        ctx.fillRect(eyeX + this.width / 2, eyeY, eyeWidth, eyeHeight);
         ctx.fillStyle = '#FFFFFF';
         ctx.font = '10px Arial';
         ctx.fillText(`Niv.${this.wave}`, this.x, this.y - 15);
-
-        // Barre de vie avec contour
         const healthBarWidth = this.width;
         const healthBarHeight = 6;
         const currentHealth = (this.health / this.maxHealth) * healthBarWidth;
-
-        // Contour de la barre de vie
         ctx.fillStyle = '#000000';
         ctx.fillRect(this.x - 1, this.y - 11, healthBarWidth + 2, healthBarHeight + 2);
-
-        // Fond rouge de la barre de vie
         ctx.fillStyle = '#FF0000';
         ctx.fillRect(this.x, this.y - 10, healthBarWidth, healthBarHeight);
-
-        // Vie actuelle en vert
         ctx.fillStyle = '#00FF00';
         ctx.fillRect(this.x, this.y - 10, currentHealth, healthBarHeight);
     }
 
     move() {
-        // Calculer la position centrale de la cible
         const targetX = path[this.pathIndex].x * GRID_SIZE + GRID_SIZE / 4;
         const targetY = path[this.pathIndex].y * GRID_SIZE + GRID_SIZE / 4;
-
-        // Appliquer la vitesse du jeu au déplacement
         const currentSpeed = this.baseSpeed * gameSpeed;
-
         if (Math.abs(this.x - targetX) < currentSpeed && Math.abs(this.y - targetY) < currentSpeed) {
             this.x = targetX;
             this.y = targetY;
             this.pathIndex++;
-
             if (this.pathIndex >= path.length) {
                 lives -= 2;
                 document.getElementById('lives').textContent = lives;
                 return true;
             }
         }
-
         if (this.x < targetX) this.x += currentSpeed;
         if (this.x > targetX) this.x -= currentSpeed;
         if (this.y < targetY) this.y += currentSpeed;
         if (this.y > targetY) this.y -= currentSpeed;
-
         if (this.health <= 0) {
             money += this.reward;
             document.getElementById('money').textContent = money;
             return true;
         }
-
         return false;
     }
 
@@ -400,18 +386,14 @@ class Enemy {
 
 let lives = 20;
 
-// Variables pour la gestion des vagues
 let currentWave = 1;
 let enemiesInWave = 5;
 let enemiesSpawned = 0;
 let waveInProgress = false;
 
 function drawGrid() {
-    // Dessiner l'herbe sur tout le terrain
     ctx.fillStyle = '#90CF50';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Dessiner la grille en plus clair
     ctx.strokeStyle = '#7FBF40';
     for (let i = 0; i < COLS; i++) {
         for (let j = 0; j < ROWS; j++) {
@@ -421,18 +403,14 @@ function drawGrid() {
 }
 
 function drawPath() {
-    // Dessiner le chemin en gris
     ctx.fillStyle = '#8B8B8B';
     for (let i = 0; i < path.length - 1; i++) {
         const current = path[i];
         const next = path[i + 1];
-
-        // Déterminer la direction du chemin
         const startX = Math.min(current.x, next.x);
         const startY = Math.min(current.y, next.y);
         const width = Math.abs(next.x - current.x) + 1;
         const height = Math.abs(next.y - current.y) + 1;
-
         ctx.fillRect(
             startX * GRID_SIZE,
             startY * GRID_SIZE,
@@ -440,19 +418,15 @@ function drawPath() {
             height * GRID_SIZE
         );
     }
-
-    // Bordures du chemin
     ctx.strokeStyle = '#696969';
     ctx.lineWidth = 2;
     for (let i = 0; i < path.length - 1; i++) {
         const current = path[i];
         const next = path[i + 1];
-
         const startX = Math.min(current.x, next.x);
         const startY = Math.min(current.y, next.y);
         const width = Math.abs(next.x - current.x) + 1;
         const height = Math.abs(next.y - current.y) + 1;
-
         ctx.strokeRect(
             startX * GRID_SIZE,
             startY * GRID_SIZE,
@@ -464,58 +438,44 @@ function drawPath() {
 
 function placeTower() {
     if (isPlacingTower || money < 50) return;
-
     isPlacingTower = true;
     const placeTowerButton = document.querySelector('button');
     placeTowerButton.style.opacity = '0.5';
-
-    // Créer une tour d'aperçu
     previewTower = {
         x: 0,
         y: 0,
         range: 150,
         isValid: false
     };
-
     canvas.addEventListener('mousemove', handleTowerPreview);
     canvas.addEventListener('click', handleTowerPlacement);
     canvas.style.cursor = 'crosshair';
+    saveGame();
 }
 
 function handleTowerPreview(e) {
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / GRID_SIZE);
     const y = Math.floor((e.clientY - rect.top) / GRID_SIZE);
-
     if (previewTower) {
         previewTower.x = x;
         previewTower.y = y;
-        // Vérifier si l'emplacement est valide
         previewTower.isValid = isValidPlacement(x, y);
     }
 }
 
 function isValidPlacement(x, y) {
-    // Vérifier si l'emplacement est sur le chemin
     if (isOnPath(x, y)) return false;
-
-    // Vérifier si une tour existe déjà
     const existingTower = towers.find(tower => tower.x === x && tower.y === y);
     if (existingTower) return false;
-
     return true;
 }
 
 function drawTowerPreview() {
     if (!previewTower) return;
-
     const x = previewTower.x * GRID_SIZE;
     const y = previewTower.y * GRID_SIZE;
-
-    // Dessiner l'aperçu de la tour
     ctx.globalAlpha = 0.5;
-
-    // Couleur selon la validité du placement
     if (previewTower.isValid) {
         ctx.fillStyle = 'rgba(74, 144, 226, 0.5)';
         ctx.strokeStyle = 'rgba(74, 144, 226, 0.8)';
@@ -523,18 +483,13 @@ function drawTowerPreview() {
         ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
         ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
     }
-
-    // Dessiner la base
     ctx.fillRect(x, y, GRID_SIZE, GRID_SIZE);
     ctx.strokeRect(x, y, GRID_SIZE, GRID_SIZE);
-
-    // Dessiner la portée
     ctx.beginPath();
     ctx.arc(x + GRID_SIZE / 2, y + GRID_SIZE / 2, previewTower.range, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(74, 144, 226, 0.1)';
     ctx.fill();
     ctx.stroke();
-
     ctx.globalAlpha = 1;
 }
 
@@ -542,21 +497,26 @@ function handleTowerPlacement(e) {
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / GRID_SIZE);
     const y = Math.floor((e.clientY - rect.top) / GRID_SIZE);
-
     if (isValidPlacement(x, y)) {
-        towers.push(new Tower(x, y));
-        money -= 50;
-        document.getElementById('money').textContent = money;
+        if (isPlacingDoubleTower) {
+            towers.push(new DoubleTower(x, y));
+            money -= 100;
+            document.getElementById('money').textContent = money;
+        } else {
+            towers.push(new Tower(x, y));
+            money -= 50;
+            document.getElementById('money').textContent = money;
+        }
     }
-
-    // Réinitialiser l'état de placement
     isPlacingTower = false;
+    isPlacingDoubleTower = false;
     previewTower = null;
     canvas.removeEventListener('mousemove', handleTowerPreview);
     canvas.removeEventListener('click', handleTowerPlacement);
     canvas.style.cursor = 'default';
     const placeTowerButton = document.querySelector('button');
     placeTowerButton.style.opacity = '1';
+    saveGame();
 }
 
 function isOnPath(x, y) {
@@ -565,7 +525,6 @@ function isOnPath(x, y) {
 
 function spawnEnemy() {
     if (!waveInProgress) return;
-
     if (enemiesSpawned < enemiesInWave) {
         enemies.push(new Enemy(currentWave));
         enemiesSpawned++;
@@ -575,18 +534,17 @@ function spawnEnemy() {
         enemiesInWave = Math.floor(5 + (currentWave * 1.5));
         enemiesSpawned = 0;
         showWaveMessage();
-        const delayBetweenWaves = 1000; // Réduit le délai
+        const delayBetweenWaves = 1000;
         setTimeout(startNextWave, delayBetweenWaves);
     }
+    saveGame();
 }
 
 function showWaveMessage() {
     const waveMessage = document.getElementById('waveMessage');
-    if (!waveMessage) return; // Vérifiez si l'élément existe
-
+    if (!waveMessage) return;
     const waveSpan = document.getElementById('wave');
     waveSpan.textContent = currentWave;
-
     const waveStats = document.getElementById('waveStats');
     if (waveStats) {
         waveStats.innerHTML = `
@@ -594,12 +552,8 @@ function showWaveMessage() {
             PV: ${100 * currentWave}<br>
         `;
     }
-
-    // Afficher le message de la vague
     waveMessage.textContent = `Vague ${currentWave}`;
     waveMessage.style.display = 'block';
-
-    // Masquer le message après 2 secondes
     setTimeout(() => {
         waveMessage.style.display = 'none';
     }, 1000);
@@ -607,8 +561,6 @@ function showWaveMessage() {
 
 function addWaveDisplay() {
     const controls = document.querySelector('.controls');
-
-    // Affichage de la vague
     const waveInfo = document.createElement('div');
     waveInfo.className = 'wave-info';
     waveInfo.innerHTML = `
@@ -616,15 +568,14 @@ function addWaveDisplay() {
         <div id="waveStats" class="wave-stats"></div>
     `;
     controls.appendChild(waveInfo);
+    saveGame();
 }
 
-// Modifier l'intervalle de spawn en fonction de la vague
 function updateSpawnInterval() {
     const baseInterval = 2000;
     const minInterval = 500;
     const reduction = currentWave * 50;
     const newInterval = Math.max(minInterval, baseInterval - reduction);
-
     clearInterval(spawnInterval);
     spawnInterval = setInterval(spawnEnemy, newInterval);
 }
@@ -639,37 +590,30 @@ function startNextWave() {
 
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     drawGrid();
     drawPath();
-
     towers.forEach(tower => {
         tower.draw();
         tower.shoot();
+        drawTowerUpgrades(tower);
     });
-
     enemies = enemies.filter(enemy => {
         enemy.draw();
         return !enemy.move();
     });
-
-    // Dessiner l'aperçu de la tour en dernier pour qu'il soit au-dessus
     drawTowerPreview();
-
     if (lives <= 0) {
-        // Afficher le message de game over
         const gameOverMessage = document.getElementById('gameOverMessage');
         gameOverMessage.style.display = 'block';
         setTimeout(() => {
             location.reload();
-        }, 2000); // Recharge la page après 2 secondes
+        }, 2000);
     }
-
     requestAnimationFrame(gameLoop);
 }
 
-// Initialisation
 function init() {
+    loadGame();
     addWaveDisplay();
     canvas.addEventListener('click', handleTowerClick);
     canvas.addEventListener('mousemove', handleTowerHover);
@@ -677,50 +621,53 @@ function init() {
     startNextWave();
 }
 
-// Appeler init au démarrage
 window.onload = init;
 
 gameLoop();
 
-// Fonction pour changer la vitesse du jeu
-function toggleSpeed() {
-    if (gameSpeed === 1) {
-        gameSpeed = 2;
-        document.getElementById('speedButton').textContent = 'Vitesse: x2';
-    } else {
-        gameSpeed = 1;
-        document.getElementById('speedButton').textContent = 'Vitesse: x1';
-    }
-}
+document.getElementById('speedSlider').addEventListener('input', function () {
+    gameSpeed = this.value;
+});
 
-// Gestionnaire de clic pour les tours
+
 function handleTowerClick(e) {
     const rect = canvas.getBoundingClientRect();
     const clickX = Math.floor((e.clientX - rect.left) / GRID_SIZE);
     const clickY = Math.floor((e.clientY - rect.top) / GRID_SIZE);
-
     towers.forEach(tower => {
         if (tower.x === clickX && tower.y === clickY) {
-            tower.upgrade();
+            upgradeTower(tower);
         }
     });
 }
 
-// Gestionnaire de survol pour les tours
 function handleTowerHover(e) {
     const rect = canvas.getBoundingClientRect();
     const hoverX = Math.floor((e.clientX - rect.left) / GRID_SIZE);
     const hoverY = Math.floor((e.clientY - rect.top) / GRID_SIZE);
-
     towers.forEach(tower => {
         tower.showUpgrade = (tower.x === hoverX && tower.y === hoverY);
-        tower.showRange = tower.showUpgrade;
+        if (tower.showUpgrade) {
+            tower.showRange = true;
+            const nextUpgrade = tower.level % 2 === 0 ? "Range" : "Speed";
+            const upgradeCost = tower.upgradeCost;
+            const range = tower.getRange();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillRect(tower.x * GRID_SIZE, tower.y * GRID_SIZE - 50, GRID_SIZE, 40);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Upgrade ${nextUpgrade}: ${upgradeCost}$`,
+                tower.x * GRID_SIZE + GRID_SIZE / 2,
+                tower.y * GRID_SIZE - 35);
+            ctx.fillText(`Range: ${range}`,
+                tower.x * GRID_SIZE + GRID_SIZE / 2,
+                tower.y * GRID_SIZE - 20);
+        }
     });
 }
 
-// Nettoyer l'aperçu si on annule le placement
 document.addEventListener('keydown', (e) => {
-    // Gestion de la touche Escape pour le placement de tour
     if (e.key === 'Escape' && isPlacingTower) {
         isPlacingTower = false;
         previewTower = null;
@@ -729,33 +676,22 @@ document.addEventListener('keydown', (e) => {
         canvas.style.cursor = 'default';
         const placeTowerButton = document.querySelector('button');
         placeTowerButton.style.opacity = '1';
+        saveGame();
         return;
     }
-
-    // Gestion du cheat code
     cheatSequence.push(e.key.toLowerCase());
-
-    // Garder seulement les 5 dernières touches
     if (cheatSequence.length > 5) {
         cheatSequence.shift();
     }
-
-    // Vérifier si la séquence correspond au cheat code
     if (cheatSequence.join('') === cheatCode.join('')) {
         money += 10000;
         document.getElementById('money').textContent = money;
-
-        // Effet visuel pour le cheat
         const moneyDisplay = document.getElementById('money');
         moneyDisplay.style.color = '#FFD700';
         setTimeout(() => {
             moneyDisplay.style.color = '';
         }, 1000);
-
-        // Réinitialiser la séquence
         cheatSequence = [];
-
-        // Message de confirmation
         const message = document.createElement('div');
         message.textContent = 'CHEAT ACTIVATED: +10000$';
         message.style.position = 'fixed';
@@ -768,11 +704,78 @@ document.addEventListener('keydown', (e) => {
         message.style.borderRadius = '10px';
         message.style.fontWeight = 'bold';
         message.style.zIndex = '1000';
-
         document.body.appendChild(message);
-
         setTimeout(() => {
             document.body.removeChild(message);
         }, 2000);
     }
 });
+
+function saveGame() {
+    const gameState = {
+        money: money,
+        lives: lives,
+        currentWave: currentWave,
+        towers: towers.map(tower => ({
+            x: tower.x,
+            y: tower.y,
+            level: tower.level
+        }))
+    };
+    localStorage.setItem('towerDefenseGame', JSON.stringify(gameState));
+}
+
+function loadGame() {
+    const savedGame = localStorage.getItem('towerDefenseGame');
+    if (savedGame) {
+        const gameState = JSON.parse(savedGame);
+        money = gameState.money;
+        lives = gameState.lives;
+        currentWave = gameState.currentWave;
+        towers = gameState.towers.map(t => new Tower(t.x, t.y, t.level));
+        document.getElementById('money').textContent = money;
+        document.getElementById('lives').textContent = lives;
+    }
+}
+
+function placeDoubleTower() {
+    if (money < 300) return;
+    money -= 300;
+    document.getElementById('money').textContent = money;
+    isPlacingDoubleTower = true;
+    const placeTowerButton = document.querySelector('button');
+    placeTowerButton.style.opacity = '0.5';
+    previewTower = {
+        x: 0,
+        y: 0,
+        isValid: false
+    };
+    canvas.addEventListener('mousemove', handleTowerPreview);
+    canvas.addEventListener('click', handleTowerPlacement);
+    canvas.style.cursor = 'crosshair';
+    saveGame();
+}
+
+function upgradeTower(tower) {
+    if (money >= tower.upgradeCost) {
+        money -= tower.upgradeCost;
+        tower.level += 1;
+        tower.upgradeCost *= 2;
+        document.getElementById('money').textContent = money;
+        saveGame();
+    }
+}
+
+function drawTowerUpgrades(tower) {
+    const centerX = tower.x * GRID_SIZE + GRID_SIZE / 2;
+    const centerY = tower.y * GRID_SIZE + GRID_SIZE / 2;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(`Niv. ${tower.level}`, centerX, centerY + 5);
+}
+
+function resetGame() {
+    localStorage.removeItem('towerDefenseGame');
+    location.reload();
+}
