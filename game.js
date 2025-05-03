@@ -580,15 +580,22 @@ function spawnEnemy() {
         enemies.push(new Enemy(currentWave));
         enemiesSpawned++;
 
-        const baseInterval = 2000;
-        const minInterval = 800;
-        const reduction = currentWave * 25;
+        const baseInterval = 2500;
+        const minInterval = 1000;
+        const reduction = currentWave * 20;
         const newInterval = Math.max(minInterval, baseInterval - reduction);
 
         clearInterval(spawnInterval);
         spawnInterval = setInterval(spawnEnemy, newInterval);
     } else if (enemies.length === 0) {
         waveInProgress = false;
+
+        const currentBestWave = parseInt(localStorage.getItem('bestWave')) || 0;
+        if (currentWave > currentBestWave) {
+            localStorage.setItem('bestWave', currentWave);
+            updateBestWave();
+        }
+
         currentWave++;
         enemiesInWave = Math.floor(5 + (currentWave * 1.2));
         enemiesSpawned = 0;
@@ -670,12 +677,6 @@ function gameLoop() {
         document.getElementById('finalWave').textContent = currentWave;
         gameOverMessage.style.display = 'block';
         clearInterval(spawnInterval);
-
-        const currentWaveRecord = parseInt(localStorage.getItem('bestWave')) || 0;
-        if (currentWave > currentWaveRecord) {
-            localStorage.setItem('bestWave', currentWave);
-            updateBestWave();
-        }
 
         const restartButton = document.createElement('button');
         restartButton.textContent = 'Recommencer';
