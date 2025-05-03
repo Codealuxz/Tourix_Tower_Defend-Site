@@ -12,6 +12,7 @@
         <div class="game-info">
             <p>Argent: <span id="money">100</span>$</p>
             <p>Vies: <span id="lives">20</span></p>
+            <p>Meilleure vague: <span id="bestWave">0</span></p>
         </div><br>
         <div class="buttons">
             <button onclick="placeTower()">Placer une tour (50$)</button>
@@ -19,13 +20,21 @@
         </div>
         <div class="speed-slider">
             <label for="speedSlider">Vitesse: <span id="speedValue">1</span></label>
-            <input type="range" min="1" max="20" value="1" id="speedSlider"
+            <input type="range" min="1" max="10" value="1" step="0.1" id="speedSlider"
                 oninput="document.getElementById('speedValue').textContent = this.value;">
+        </div>
+        <div class="wave-control">
+            <label for="waveInput">Aller à la vague:</label>
+            <input type="number" id="waveInput" min="1" value="1" style="width: 60px;">
+            <button onclick="goToWave()">Go</button>
         </div>
         <button onclick="resetGame()">Réinitialiser le jeu</button>
     </div>
     <div id="waveMessage" class="message" style="display: none;"></div>
-    <div id="gameOverMessage" class="message" style="display: none;">Game Over!</div>
+    <div id="gameOverMessage" class="message" style="display: none;">
+        <h2>Game Over!</h2>
+        <p>Vous avez atteint la vague <span id="finalWave"></span></p>
+    </div>
     <script src="game.js"></script>
 </body>
 

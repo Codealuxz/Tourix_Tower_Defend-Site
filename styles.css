@@ -1,32 +1,16 @@
 :root {
-<<<<<<< HEAD
-=======
-
->>>>>>> 447ebf5d50bf018dbb980bc9773a5b2050afd6c5
     --color-background: #000c18;
     --color-primary: #34acdb;
     --color-primary-dark: #2954b9;
     --color-secondary: #ffffff10;
     --color-accent: #E74C3C;
     --color-accent-dark: #C0392B;
-<<<<<<< HEAD
     --color-text: white;
     --color-text-muted: #BDC3C7;
     --color-value: #F1C40F;
     --color-grass: #90CF50;
     --color-disabled: #95A5A6;
     --color-gold: #FFD700;
-=======
-
-    --color-text: white;
-    --color-text-muted: #BDC3C7;
-    --color-value: #F1C40F;
-
-    --color-grass: #90CF50;
-    --color-disabled: #95A5A6;
-    --color-gold: #FFD700;
-
->>>>>>> 447ebf5d50bf018dbb980bc9773a5b2050afd6c5
     --color-overlay-dark: rgba(0, 0, 0, 0.8);
     --color-overlay-light: rgba(0, 0, 0, 0.3);
     --color-overlay-blue: rgba(74, 144, 226, 0.2);
@@ -68,18 +52,12 @@ body {
     flex-wrap: wrap;
 }
 
-<<<<<<< HEAD
 .controls div {
     display: flex;
     gap: 20px;
     justify-content: center;
 }
 
-
-
-
-=======
->>>>>>> 447ebf5d50bf018dbb980bc9773a5b2050afd6c5
 button {
     background-color: var(--color-primary);
     color: var(--color-text);
@@ -169,17 +147,39 @@ span {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #FFD700;
-    padding: 20px;
+    background-color: var(--color-overlay-dark);
+    color: var(--color-text);
+    padding: 30px;
     border-radius: 10px;
     font-weight: bold;
     z-index: 1000;
-    display: none;
-<<<<<<< HEAD
-=======
+    text-align: center;
+    min-width: 300px;
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
 
->>>>>>> 447ebf5d50bf018dbb980bc9773a5b2050afd6c5
+.message h2 {
+    color: var(--color-accent);
+    margin-top: 0;
+    font-size: 24px;
+}
+
+.message button {
+    margin-top: 20px;
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.message button:hover {
+    background-color: var(--color-primary-dark);
+    transform: scale(1.05);
 }
 
 .tower-info {
@@ -225,4 +225,28 @@ span {
     button {
         width: 100%;
     }
+}
+
+.wave-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+    padding: 10px;
+    background-color: var(--color-secondary);
+    border-radius: 5px;
+}
+
+.wave-control input[type="number"] {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    border: 1px solid var(--color-primary);
+    border-radius: 3px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.wave-control button {
+    padding: 5px 15px;
+    font-size: 14px;
 }
